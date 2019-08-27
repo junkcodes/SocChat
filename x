@@ -5,7 +5,6 @@ import java.util.Scanner;
 public class SocketUdp {
     public static void main(String[] Str) throws IOException, InterruptedException {
         int client=0,server=0,end = 0;
-        StringBuilder name = new StringBuilder();
         if(Str[2].equals("Client")){
             client = 1;
         }
@@ -14,21 +13,27 @@ public class SocketUdp {
         }
         while(true){
             if(client == 1){
+                if(end  == 1){
+                    break;
+                }
                 DatagramSocket ds = new DatagramSocket();
                 InetAddress ip = InetAddress.getByName(Str[0]);
                 byte buf[] = null;
-                buf = Str[3].getBytes();
-                DatagramPacket DpSend = new DatagramPacket(buf, buf.length, ip, Integer.parseInt(Str[1]));
-                ds.send(DpSend);
                 System.out.print("Me : ");
                 Scanner input = new Scanner(System.in);
+                StringBuilder name = new StringBuilder();;
+                name.append(Str[3]+" : ");
                 String mssg = input.nextLine();
+                if(mssg.equals("Exit")){
+                    end = 1;
+                }
+                mssg = name + mssg;
                 buf = mssg.getBytes();
-                DpSend = new DatagramPacket(buf, buf.length, ip, Integer.parseInt(Str[1]));
+                DatagramPacket DpSend = new DatagramPacket(buf, buf.length, ip, Integer.parseInt(Str[1]));
                 ds.send(DpSend);
                 server = 1;
                 client = 0;
-                if(mssg.equals("Exit")){
+                if(end == 1){
                     break;
                 }
                 Thread.sleep(1000);
@@ -39,13 +44,10 @@ public class SocketUdp {
                 DatagramPacket DpReceive = null;
                 DpReceive = new DatagramPacket(receive, receive.length);
                 ds.receive(DpReceive);
-                name = data(receive);
-                DpReceive = new DatagramPacket(receive, receive.length);
-                ds.receive(DpReceive);
-                System.out.println(name+" : "+data(receive));
+                System.out.println(data(receive));
                 server = 0;
                 client = 1;
-                if(data(receive).toString().equals("Exit")){
+                if(end  == 1){
                     break;
                 }
                 ds.close();
